@@ -98,7 +98,7 @@ const index = `<!DOCTYPE html>
     </a>
   </div>
   <footer>
-    <p>Powered by PubMed + Zhipu AI \u00B7 <a href="https://github.com/u8901006/art-therapy">GitHub</a></p>
+    <p>Powered by PubMed + NVIDIA AI \u00B7 <a href="https://github.com/u8901006/art-therapy">GitHub</a></p>
   </footer>
 </div>
 </body>

@@ -1,16 +1,16 @@
 #!/usr/bin/env node
 /**
- * Generate art therapy daily report HTML using Zhipu AI.
- * Reads papers JSON, analyzes with AI (GLM-5-Turbo with fallbacks),
+ * Generate art therapy daily report HTML using NVIDIA AI.
+ * Reads papers JSON, analyzes with NVIDIA Nemotron 3 Super with a Nano fallback,
  * generates styled HTML matching the warm cream/copper theme.
  */
 
 import { writeFileSync, readFileSync, mkdirSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 
-const API_BASE = process.env.ZHIPU_API_BASE || "https://open.bigmodel.cn/api/coding/paas/v4";
-const MODELS = ["glm-5-turbo", "glm-4.7", "glm-4.7-flash"];
-const MAX_TOKENS = 50000;
+const API_BASE = "https://integrate.api.nvidia.com/v1";
+const MODELS = ["nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3-nano-30b-a3b"];
+const MAX_TOKENS = 16384;
 const TIMEOUT_MS = 480_000;
 const MAX_RETRIES = 3;
 
@@ -152,9 +152,11 @@ ${papersText}
             { role: "system", content: SYSTEM_PROMPT },
             { role: "user", content: prompt },
           ],
-          temperature: 0.3,
-          top_p: 0.9,
+          temperature: 1.0,
+          top_p: 0.95,
           max_tokens: MAX_TOKENS,
+          stream: false,
+          chat_template_kwargs: { enable_thinking: false },
         };
 
         const resp = await fetch(`${API_BASE}/chat/completions`, {
@@ -367,7 +369,7 @@ function generateHtml(analysis) {
       <div class="header-meta">
         <span class="badge badge-date">\u{1F4C5} ${dateDisplay}</span>
         <span class="badge badge-count">\u{1F4CA} ${totalCount} \u7BC7\u6587\u737B</span>
-        <span class="badge badge-source">Powered by PubMed + Zhipu AI</span>
+        <span class="badge badge-source">Powered by PubMed + NVIDIA AI</span>
       </div>
     </div>
   </header>
@@ -436,10 +438,10 @@ async function main() {
 
   const inputPath = getInput() || "papers.json";
   const outputPath = getOutput() || "docs/art-therapy-report.html";
-  const apiKey = process.env.ZHIPU_API_KEY || "";
+  const apiKey = process.env.NVIDIA_API_KEY || "";
 
   if (!apiKey) {
-    console.error("[ERROR] ZHIPU_API_KEY environment variable is required");
+    console.error("[ERROR] NVIDIA_API_KEY environment variable is required");
     process.exit(1);
   }
 
